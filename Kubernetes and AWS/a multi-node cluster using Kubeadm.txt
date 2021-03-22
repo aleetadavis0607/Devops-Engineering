@@ -1,0 +1,144 @@
+Launch a multi-node cluster using Kubeadm
+Bootstrap a Kubernetes cluster using Kubeadm
+
+1 - Initialise Master
+Kubeadm has been installed on the nodes.
+
+The first stage of initialising the cluster is to launch the master node.
+The master is responsible for running the control plane components, etcd and the API server.
+Clients will communicate to the API to schedule workloads and manage the state of the cluster.
+
+Task : 
+
+kubeadm init --token=102952.1a7dd4cc8d1f4cc5 --kubernetes-version $(kubeadm version -o short):
+initialises the cluster with a known token to simplify.
+
+In production, it's recommend to exclude the token causing kubeadm to generate one on your behalf.
+
+To manage the Kubernetes cluster, the client configuration and certificates are required. 
+This configuration is created when kubeadm initialises the cluster. 
+
+sudo cp /etc/kubernetes/admin.conf $HOME/
+sudo chown $(id -u):$(id -g) $HOME/admin.conf      
+export KUBECONFIG=$HOME/admin.conf
+The command copies the configuration to the users home directory and sets the environment variable for use with the CLI.
+
+
+2 - Deploy Container Networking Interface (CNI)
+The Container Network Interface (CNI) defines how the different nodes and their workloads should communicate. 
+There are multiple network providers available.
+
+Task :
+Here we use WeaveWorks.
+The deployment definition can be viewed : cat /opt/weave-kube.yaml
+
+This can be deployed using kubectl apply : 
+kubectl apply -f /opt/weave-kube.yaml
+
+Weave will now deploy as a series of Pods on the cluster. 
+The status of this can be viewed using the command:
+kubectl get pod -n kube-system 
+NAME                                   READY   STATUS    RESTARTS   AGE
+coredns-fb8b8dccf-qjg5v                0/1     Pending   0          7m18s
+coredns-fb8b8dccf-wzrh5                0/1     Pending   0          7m18s
+etcd-controlplane                      1/1     Running   0          6m30s
+kube-apiserver-controlplane            1/1     Running   0          7m14s
+kube-controller-manager-controlplane   1/1     Running   0          6m21s
+kube-proxy-m4sq9                       1/1     Running   0          7m18s
+kube-scheduler-controlplane            1/1     Running   1          7m16s
+weave-net-p8hf8                        2/2     Running   0          19s
+
+3 - Join Cluster
+Once the Master and CNI has initialised, additional nodes can join the cluster as long as they have the correct token.
+The tokens can be managed via kubeadm token, for example 
+kubeadm token list.
+TOKEN                     TTL       EXPIRES                USAGES                
+   DESCRIPTION                                               EXTRA GROUPS
+102952.1a7dd4cc8d1f4cc5   23h       2021-03-21T11:16:13Z   authentication,signin
+
+
+Task :
+On the second node, run the command to join the cluster providing the IP address of the Master node.
+
+kubeadm join --discovery-token-unsafe-skip-ca-verification --token=102952.1a7dd4cc8d1f4cc5 172.17.0.23:6443
+
+This is the same command provided after the Master has been initialised.
+
+The --discovery-token-unsafe-skip-ca-verification tag is used to bypass the Discovery Token verification. 
+As this token is generated dynamically, we couldn't include it within the steps.
+When in production, use the token provided by kubeadm init.
+
+
+The Master node will manage the cluster, while our one worker node will run our container workloads.
+4.view nodes  :
+
+The Kubernetes CLI, known as kubectl, can now use the configuration to access the cluster. 
+For example, the command below will return the two nodes in our cluster.
+
+kubectl get nodes
+NAME           STATUS   ROLES    AGE     VERSION
+controlplane   Ready    master   38m     v1.14.0
+node01         Ready    <none>   3m36s   v1.14.0
+
+5 - Deploy Pod
+The state of the two nodes in the cluster should now be Ready.
+This means that our deployments can be scheduled and launched.
+
+Using Kubectl, it's possible to deploy pods.
+Commands are always issued for the Master with each node only responsible for executing the workloads.
+
+the command below creates a Pod based on the Docker Image , katacoda/docker-http-server.
+kubectl create deployment http --image=katacoda/docker-http-server:latest  
+
+The status of the Pod creation can be viewed using  :  kubectl get pods
+
+Once running, you can see the Docker Container running on the node :  docker ps | grep docker-http-server
+
+
+
+6 - Deploy Dashboard
+Kubernetes has a web-based dashboard UI giving visibility into the Kubernetes cluster.
+
+Task :
+Deploy the dashboard yaml with the command : kubectl apply -f dashboard.yaml
+
+The dashboard is deployed into the kube-system namespace.
+View the status of the deployment with kubectl get pods -n kube-system
+
+A ServiceAccount is required to login.
+A ClusterRoleBinding is used to assign the new ServiceAccount (admin-user) the role of cluster-admin on the cluster.
+
+cat <<EOF | kubectl create -f - 
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kube-system
+EOF
+
+This means they can control all aspects of Kubernetes.
+With ClusterRoleBinding and RBAC, different level of permissions can be defined based on security requirements.
+More information on creating a user for the Dashboard can be found in the Dashboard documentation.
+
+Once the ServiceAccount has been created, the token to login can be found with:
+kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep admin-user | awk '{print $1}')
+  
+
+
+
+
+
+

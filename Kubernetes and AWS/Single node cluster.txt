@@ -1,0 +1,70 @@
+Launch Single Node Kubernetes Cluster:
+
+
+Minikube is a tool that makes it easy to run Kubernetes locally.
+Minikube runs a single-node Kubernetes cluster inside a VM on your laptop for users looking to try out Kubernetes or develop with it day-to-day.
+
+1.start minikube 
+minikube version   : Checks if properly installed
+minikube start     : Starts the cluster
+
+The cluster can be interacted with using the kubectl CLI.
+This is the main approach used for managing Kubernetes and the applications running on top of the cluster.
+
+2.cluster info
+
+kubectl cluster-info : Details of the cluster can be discovered
+Kubernetes master is running at https://172.17.0.27:8443
+KubeDNS is running at https://172.17.0.27:8443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+ 
+kubectl get nodes    : view the nodes in the cluster
+NAME       STATUS   ROLES    AGE     VERSION
+minikube   Ready    master   4m27s   v1.17.3
+
+Now we have only one node.
+we can see that it’s status is ready (it is ready to accept applications for deployment).
+
+
+With a running Kubernetes cluster, containers can now be deployed.
+3.deploy containers
+kubectl run : it allows containers to be deployed onto the cluster 
+
+kubectl create deployment first-deployment --image=katacoda/docker-http-server
+deployment.apps/first-deployment created
+ 
+kubectl get pods
+NAME                               READY   STATUS    RESTARTS   AGE
+first-deployment-666c48b44-6jvzm   1/1     Running   0          46s
+
+Once the container is running it can be exposed via different networking options, depending on requirements.
+One possible solution is NodePort, that provides a dynamic port to a container.ie.
+
+kubectl expose deployment first-deployment --port=80 --type=NodePort
+service/first-deployment exposed
+
+The command below finds the allocated port and executes a HTTP request.
+
+export PORT=$(kubectl get svc first-deployment -o go-template='{{range.spec.ports}}{{if .nodePort}}{{.nodePort}}{{"\n"}}{{end}}{{end}}')
+echo "Accessing host01:$PORT"
+curl host01:$PORT
+
+The result is the container that processed the request.
+
+
+
+4.dashboard
+minikube addons enable dashboard  :  Enable the dashboard using Minikube with the command 
+
+
+kubectl apply -f /opt/kubernetes-dashboard.yaml :
+Make the Kubernetes Dashboard available by deploying the following YAML definition. This should only be used on Katacoda.
+
+
+The Kubernetes dashboard allows you to view your applications in a UI. 
+In this deployment, the dashboard has been made available on port 30000 but may take a while to start.
+
+To see the progress of the Dashboard starting, watch the Pods within the kube-system namespace using :
+kubectl get pods -n kubernetes-dashboard -w
+NAME                                         READY   STATUS    RESTARTS   AGE
+dashboard-metrics-scraper-7b64584c5c-gm6h4   1/1     Running   0          3m17s
+kubernetes-dashboard-79d9cd965-4wzlv         1/1     Running   0          3m17s
