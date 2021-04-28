@@ -1,0 +1,39 @@
+Setup CI/CD Pipeline for Java MicroServices Application on Azure AKS. Use Azure Devops, Github, K8s ,Terraform,  Docker,Docker  Hub ,Azure Storage Account, Resource group and required tools
+
+
+STEPS
+
+1.Create a folder k8s pipeline
+2.Copy paste the microservices folder onto it
+3.Meanwhile create a project in azure devops 
+4.Also create a repository in github
+5.Push the files in the folder on to the github
+6.In the azure, create a pipeline > github>choose the required> choose the repo created >next > create
+7.A job will run successful
+8.Meanwhile refresh the github and you can see the pipeline created 
+9.Now in local repo edit the dockerfile and repeat the above procedure and run a job
+10.Now for the Java Application to run
+11.First connect with github
+12.Create kubernet connection ,docker hub connection
+13.Meanwhile in Azure Devops (plugins,ssh key,libraries,terraform has to be installed)
+14.For ssh key
+       {# Create Service Account To Create Azure K8S Cluster using Terraform
+       az login
+       az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<<azure_subscription_id>>"
+
+       # Create Public Key for SSH Access
+       ssh-keygen -m PEM -t rsa -b 4096 # PEM - Privacy Enhanced Mail - Certificate Format RSA- Encryption Algorithm
+
+       # ls /Users/rangakaranam/.ssh/id_rsa.pub
+
+       # Get Cluster Credentials 
+       az aks get-credentials --name <<MyManagedCluster>> --resource-group <<MyResourceGroup>>}
+     
+15.	For Deploying the Java App
+16.	First Azure (Create resource group,storage account,container)
+17.	In Azure Devops create a pipeline with the the files provided
+18.	For K8s 
+       az aks get-credentials --name k8stest_dev --resource-group kubernetes_dev
+then create pipeline with the files
+19.	Similarly using Terraform and docker hub
+20.	Hence you can deploy your application using Azure,  Azuredevops, Docker hub ,K8s, Terraform successfully
