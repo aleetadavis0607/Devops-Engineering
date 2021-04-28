@@ -1,0 +1,33 @@
+Create an Automated Project Setup on Atlassian Stack : 	JIRA Project Setup
+
+1.Open jira -> Projects -> New project.
+2.Select a suitable template for your project.
+3.Type a project name and make sure to give a correct key to your project as changing key name after creation is a   bit difficult.
+4.Click on create and you will be directed to your project home page.
+5.Automatically a project board will be created by jira or you can also create your own project board.
+6.On the LHS there are backlogs, sprints and many other features. Just take a tour around.
+7.Go to project settings if you want to change any user settings.
+8.Workflow can be changed as per your requirements.
+
+
+CREATING A SPRINT:
+There are different types of issues that can be created in jira:
+
+Epic
+A big user story that needs to be broken down. Epics group together bugs, stories, and tasks to show the progress of a larger initiative. In agile development, epics usually represent a significant deliverable, such as a new feature or experience in the software your team develops.
+
+Bug
+A bug is a problem which impairs or prevents the functions of a product.
+Story
+A user story is the smallest unit of work that needs to be done.
+
+Task
+A task represents work that needs to be done.
+
+Subtask
+A subtask is a piece of work that is required to complete a task. Subtasks issues can be used to break down any of your standard issues in Jira (bugs, stories or tasks).
+
+
+Create any type of issues, let’s say an epic and start sprint by giving the start & end date of the sprint.
+The sprint will alert you above the issues in your project
+

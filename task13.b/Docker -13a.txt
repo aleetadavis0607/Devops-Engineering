@@ -1,0 +1,18 @@
+Docker Learning Outcomes:
+
+•Pull a docker image from docker hub and build it.
+•Creating docker-compose file
+•Creating your own docker image and push it to the hub
+•Deploying a web application using docker containers.
+
+
+Steps to deploy a java application using docker:
+
+1.Create Dockerfile.
+2.docker build –t aleetadavis/hello-world-java:0.0.2.RELEASE .
+3.The above command will build the application and deploy it to the server.
+4.docker run -d -p 5000:5000 aleetadavis/hello-world-java:0.0.2.RELEASE
+5.To push the docker image to the docker hub 
+  docker push aleetadavis/hello-world-java:0.0.2.RELEASE
+
+Similarly for any application we can build,run and push the a[[lication to the server.

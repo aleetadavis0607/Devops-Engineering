@@ -1,0 +1,36 @@
+JENKINS CI CD PIPELINE USING GIT
+
+1.Open virtual machine and start Jenkins & docker server.
+2.Sign in to Jenkins using user credentials.
+3.Create 3 jobs, as job1 – Build, job 2 – Test, job 3 – Deploy.
+4.To create job : New item -> Job name -> Freestyle project -> Create
+5.Repeat the same for job2 & job 3 as well.
+6.For connecting your repository link:
+7.Job 1 -> Configure -> Source code management -> git -> URL ->save & apply.
+8.Repeat the same for job2&3.
+ 
+
+For Jenkins to build continuously we need to install maven and its dependencies.
+1.Configure job 1 -> Build -> Build using shell commands -> Mention the code directory & maven install(Required   commands) -> Save &Apply.
+2.After job 1 is build and success, it should be deployed to a docker container. For that we need to build a docker   container in job 2.
+3.Configure job2 -> Build -> Shell commands.
+4.In the shell commands mention the directory, commands to create docker container etc  -> Save
+
+In job 3, we need to deploy the application after successful building & testing.
+Configure job 3 -> Build -> Shell commands -> Mention the docker container build in the previous job.
+Save & Apply.
+
+Since it is a CI CD pipeline all the 3 jobs must be interconnected.
+For that, Jenkins should know which job must be executed next after completing one job.
+Configure job1 -> Post build actions -> Build other job -> job 2.
+Similarly configure job 2 as well.
+
+CREATING PIPELINE :
+1.Click on the ‘+’ above the jobs.
+2.Type the view name (Pipeline name)
+3.Click on build pipeline view.
+4.Mention from where pipeline should start.
+5.Apply & OK.
+6.Pipeline is created.
+7.Run the pipeline and your jobs will be continuously integrated
+
