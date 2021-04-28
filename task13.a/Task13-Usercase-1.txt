@@ -1,0 +1,24 @@
+Setup Azure DevOps CI CD Pipeline for App Service Application & Deploy to Dev, QA, Production Server.Add Approver
+for every stage
+
+
+STEPS:
+1.Create a new project:azureproject-dotnet in Azure DevOps(dev.azure.com) in an organisation created.
+2.In project settings->service connections->create new service connection
+3.Create a folder web-app->open folder in command prompt->dotnet new mvc
+4.git init
+  git add .
+  git commit -m "dotnet files added"
+  push to an existing repository to the Repos in Azure DevOps. 
+5.Go to portal.azure.com and create a new resource group.Then go to home->create a resource->web app.
+  Select the resource group,a webapp name for the stage:deployment,runtimestack->.NET5 and create.
+4.Create a pipeline->Use the classic editor->Azure Repos Git->ASP.NET Core->Enable continuous integration in Triggers
+  Save & Queue->Save & Run
+5.Create a release in pipeline->add artifact->add stage 1 as Deployement
+  Select a template->Azure App Service deployment
+  Click on 1job,1task and create stage 1 .
+6.Save the stage and Create Release.
+7.Similarly create web app for QA and Production.
+8.Create 2 new stages from Development(not parallel) : QA and Production using respective webapps and service   connections.
+9.Create a release using these 3 stages.
+10.Add approvals to these stages by enabling Pre deployment->add approvers->save->create release.
